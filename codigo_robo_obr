@@ -1,0 +1,57 @@
+#include <Adafruit_MotorShield.h>
+#include <Wire.h>
+#include <Arduino.h>
+
+#define sensorEsquerda 8
+#define sensorDireita 6
+
+Adafruit_MotorShield AFMS = Adafruit_MotorShield();
+
+Adafruit_DCMotor *Motor1 = AFMS.getMotor(1);
+Adafruit_DCMotor *Motor2 = AFMS.getMotor(2);
+Adafruit_DCMotor *Motor3 = AFMS.getMotor(3);
+Adafruit_DCMotor *Motor4 = AFMS.getMotor(4);
+
+void setup()
+{
+
+    AFMS.begin();
+    Motor1->setSpeed(210);
+    Motor2->setSpeed(210);
+    Motor3->setSpeed(210);
+    Motor4->setSpeed(210);
+    Serial.begin(9600);
+    pinMode(sensorEsquerda, INPUT);
+    pinMode(sensorDireita, INPUT); // put your setup code here, to run once:
+}
+
+void loop()
+{
+    if (digitalRead(sensorEsquerda) && digitalRead(sensorDireita) == HIGH)
+    {
+        MotoresDireita();
+        MotoresEsquerda();
+    }
+    else
+    {
+        Parar();
+    }
+}
+
+void MotoresDireita()
+{
+    Motor1->run(BACKWARD);
+    Motor2->run(BACKWARD);
+}
+
+void MotoresEsquerda()
+{
+    Motor4->run(BACKWARD);
+    Motor3->run(BACKWARD);
+}
+
+void Parar()
+{
+    Motor1->run(RELEASE);
+    Motor2->run(RELEASE);
+}
