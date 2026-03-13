@@ -2,100 +2,111 @@
 #include <Wire.h>
 #include <Arduino.h>
 
-int pinDigital = 8;
-int pinAnalogico = A0;
-int valorDigital;
-int valorAnalogico;
+#define pinDigital 8
+#define pinDigital2 7
+#define trigPin  9
+#define echoPin  10
 
-int pinDigital2 = 7;
+int pinAnalogico = A0; 
+int valorDigital; 
+int valorAnalogico;
+ 
 int pinAnalogico2 = A1;
-int valorDigital2;
+int valorDigital2; 
 int valorAnalogico2;
+
+float duration, distance;
 
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 
-Adafruit_DCMotor *Motor1 = AFMS.getMotor(1);
-Adafruit_DCMotor *Motor2 = AFMS.getMotor(2);
-Adafruit_DCMotor *Motor3 = AFMS.getMotor(3);
-Adafruit_DCMotor *Motor4 = AFMS.getMotor(4);
 
-void setup()
-{
+  Adafruit_DCMotor *Motor1 = AFMS.getMotor(1);
+  Adafruit_DCMotor *Motor2 = AFMS.getMotor(2);
+  Adafruit_DCMotor *Motor3 = AFMS.getMotor(3);
+  Adafruit_DCMotor *Motor4 = AFMS.getMotor(4);
 
-    AFMS.begin();
-    Motor1->setSpeed(210);
-    Motor2->setSpeed(210);
-    Motor3->setSpeed(210);
-    Motor4->setSpeed(210);
-    Serial.begin(9600);
-    pinMode(pinDigital, INPUT);
-    pinMode(pinAnalogico, INPUT);
-    pinMode(pinDigital2, INPUT);
-    pinMode(pinAnalogico2, INPUT);
-    // put your setup code here, to run once:
+
+
+
+void setup() {
+
+  AFMS.begin();
+  Motor1->setSpeed(210);
+  Motor2->setSpeed(210);
+  Motor3->setSpeed(210);
+  Motor4->setSpeed(210);
+  Serial.begin(9600);  
+  pinMode(pinDigital ,INPUT);
+  pinMode(pinAnalogico ,INPUT);
+  pinMode(pinDigital2 ,INPUT);
+  pinMode(pinAnalogico2 ,INPUT);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  // put your setup code here, to run once:
+
 }
 
-void loop()
-{
 
-    valorDigital = digitalRead(pinDigital);    // Realiza a leitura digital e armazena o valor na variavel valorDigital
-    valorAnalogico = analogRead(pinAnalogico); // Realiza a leitura analógica e armazena o valor na variavel valorAnalogico
-    valorDigital2 = digitalRead(pinDigital2);
-    valorAnalogico2 = analogRead(pinAnalogico2);
 
-    Serial.print("Leitura Digital: "); // Mostra o texto no monitor serial
-    Serial.println(valorDigital);      // Mostra o valor digital no monitor serial
+void loop() {
+  
+valorDigital = digitalRead(pinDigital); //Realiza a leitura digital e armazena o valor na variavel valorDigital
+valorAnalogico = analogRead(pinAnalogico); //Realiza a leitura analógica e armazena o valor na variavel valorAnalogico
+valorDigital2 = digitalRead(pinDigital2);
+valorAnalogico2 = analogRead(pinAnalogico2); 
 
-    Serial.print("Leitura Analogica: "); // Mostra o texto no monitor serial
-    Serial.println(valorAnalogico);      // Exibe o valor analógico lido no monitor serial
-    Serial.println();                    // Salta uma linha
+Serial.println(valorDigital);
+Serial.println(valorDigital2);
+Serial.println(valorAnalogico);
+Serial.println(valorAnalogico2);
+Serial.println("============");
+delay(2000);
 
-    if (valorDigital == 0)
-    { // Se o valor digital do sensor for igual a 0 significa que a linha não foi detectada
-        Serial.println("Linha não detectada");
-    }
-    else if (valorDigital == 1)
-    { // Se o valor digital do sensor for igual a 1 significa que a linha foi detectada
-        Serial.println("Linha detectada");
-    }
-    delay(50);
-    Serial.println("----------------------------------------------");
 
-    if (valorDigital == 1 && valorDigital2 == 1)
-    {
-        MotoresDireita();
-        MotoresEsquerda();
-    }
-    else if (valorDigital == 1)
-    {
-        MotoresDireita();
-    }
-    else if (valorDigital2 == 1)
-    {
-        MotoresEsquerda();
-    }
-    else
-    {
-        Parar();
-    }
+  if (valorDigital == 1 && valorDigital2 == 1){
+    MotoresDireita();
+    MotoresEsquerda();
+  }
+  else if (valorDigital == 1){
+    MotoresEsquerda();
+  }
+  else if (valorDigital2 == 1){
+    MotoresDireita();
+  }
+  else{
+    Parar();
+  }
+
+  leituraSensor();
+
 }
 
-void MotoresDireita()
-{
+
+void MotoresDireita(){
     Motor1->run(BACKWARD);
     Motor2->run(BACKWARD);
 }
 
-void MotoresEsquerda()
-{
+void MotoresEsquerda(){
     Motor4->run(BACKWARD);
     Motor3->run(BACKWARD);
 }
 
-void Parar()
-{
+void Parar(){
     Motor1->run(RELEASE);
-    Motor2->run(RELEASE);
+    Motor2->run(RELEASE); 
     Motor3->run(RELEASE);
-    Motor4->run(RELEASE);
+    Motor4->run(RELEASE);    
+}
+
+void leituraSensor(){
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+    duration = pulseIn(echoPin, HIGH);
+    distance = (duration*.0343)/2;
+    Serial.println(distance);
+    delay(2000);
 }
