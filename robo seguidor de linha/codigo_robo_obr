@@ -31,10 +31,10 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 void setup() {
 
   AFMS.begin();
-  Motor1->setSpeed(210);
-  Motor2->setSpeed(210);
-  Motor3->setSpeed(210);
-  Motor4->setSpeed(210);
+  Motor1->setSpeed(60);
+  Motor2->setSpeed(60);
+  Motor3->setSpeed(60);
+  Motor4->setSpeed(60);
   Serial.begin(9600);  
   pinMode(pinDigital ,INPUT);
   pinMode(pinAnalogico ,INPUT);
@@ -60,24 +60,29 @@ Serial.println(valorDigital2);
 Serial.println(valorAnalogico);
 Serial.println(valorAnalogico2);
 Serial.println("============");
-delay(2000);
+delay(50);
 
 
-  if (valorDigital == 1 && valorDigital2 == 1){
+  if (valorDigital == 0 && valorDigital2 == 0){
+    tras();
     MotoresDireita();
     MotoresEsquerda();
   }
-  else if (valorDigital == 1){
+  else if (valorDigital == 1 && valorDigital2 == 0){
+    tras();
     MotoresEsquerda();
+    pararDireita();
   }
-  else if (valorDigital2 == 1){
+  else if (valorDigital2 == 1 && valorDigital == 0){
+    tras();
     MotoresDireita();
+    pararEsquerda();
   }
   else{
     Parar();
   }
 
-  leituraSensor();
+//  leituraSensor();
 
 }
 
@@ -99,6 +104,18 @@ void Parar(){
     Motor4->run(RELEASE);    
 }
 
+void pararEsquerda(){
+    Motor3->run(RELEASE);
+    Motor4->run(RELEASE); 
+}
+
+void pararDireita(){
+    Motor1->run(RELEASE);
+    Motor2->run(RELEASE); 
+}
+
+
+
 void leituraSensor(){
     digitalWrite(trigPin, LOW);
     delayMicroseconds(2);
@@ -108,5 +125,12 @@ void leituraSensor(){
     duration = pulseIn(echoPin, HIGH);
     distance = (duration*.0343)/2;
     Serial.println(distance);
-    delay(2000);
+    delay(50);
+}
+
+void tras(){
+   Motor1->run(FORWARD);
+    Motor2->run(FORWARD); 
+    Motor3->run(FORWARD);
+    Motor4->run(FORWARD);  
 }
